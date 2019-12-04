@@ -20,14 +20,14 @@ sleep 1
 stop() 
 {
 echo 'Stopping '${processName}'...'
-pid=$(/usr/sbin/pidof ${process})
+pid=$(/usr/bin/pidof ${process})
 kill ${pid}
 sleep 1
 }
 
 status() 
 {
-pid=$(/usr/sbin/pidof ${process})
+pid=$(/usr/bin/pidof ${process})
 if [[ "$pid" != "" ]]; then
 echo ${processName}' is running...'
 else

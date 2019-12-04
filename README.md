@@ -1,3 +1,3 @@
 # gogophish
 
-Work in progress...
+Work in progress... (Fly into Gophish with one click)

@@ -102,7 +102,7 @@ setup() {
 	chmod +x /etc/init.d/gophish
 	update-rc.d gophish defaults
 
-	ipAddr=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
 	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 [Login] Username:admin Password:gophish${clear}"
 	service gophish start
 }
@@ -136,7 +136,7 @@ gophishRestart() {
 
 	if [[ $service ]];
 	then
-		ipAddr=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+		ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
 		echo "${green}${bold}[+] Gophish restarted: https://$ipAddr:3333 (Login: admin:gophish)${clear}" &&
 		service gophish restart
 	else

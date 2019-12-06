@@ -80,7 +80,7 @@ setup() {
 		echo "${cyan}${bold}[+] Unzip already installed${clear}"
 	else
 		echo "${blue}${bold}[*] Installing unzip...${clear}"
-		apt-get install unzip -qq
+		apt-get install unzip 1>/dev/null
 	fi
 
 	### Installing GoPhish v0.7.0 (*Reliable as of 11/30/19)
@@ -103,7 +103,7 @@ setup() {
 	update-rc.d gophish defaults
 
 	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 [Login] Username:admin Password:gophish${clear}"
+	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
 	service gophish start
 }
 
@@ -114,8 +114,8 @@ letsEncrypt() {
 	echo "${blue}${bold}[*] Downloading certbot-auto...${clear}" 
 	wget https://dl.eff.org/certbot-auto -qq
 	chmod a+x certbot-auto
-	echo "${blue}${bold}[*] Installing certbot-auto...${clear}"
-	./certbot-auto --install-only --quiet
+	echo "${blue}${bold}[*] Installing certbot-auto...(This might take a couple of sec...)${clear}"
+	./certbot-auto --install-only --quiet 1>/dev/null
 
 	### Installing SSL Cert	
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
@@ -137,7 +137,7 @@ gophishRestart() {
 	if [[ $service ]];
 	then
 		ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-		echo "${green}${bold}[+] Gophish restarted: https://$ipAddr:3333 (Login: admin:gophish)${clear}" &&
+		echo "${green}${bold}[+] Gophish restarted: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}" &&
 		service gophish restart
 	else
 		exit 1

@@ -98,7 +98,7 @@ setup() {
 
 	echo "${blue}${bold}[*] Installing gophish...${clear}"
 	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json
-	cp gophish /etc/init.d/gophish
+	cp gophish_start /etc/init.d/gophish
 	chmod +x /etc/init.d/gophish
 	update-rc.d gophish defaults
 

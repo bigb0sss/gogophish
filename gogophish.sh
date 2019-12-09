@@ -72,6 +72,9 @@ exit_error() {
 
 ### Setup GoPhish
 setup() {
+	### Cleaning Port 80
+	fuser -k -n tcp 80 1>/dev/null
+
 	### Checking/Installing unzip
 	unzip=$(which unzip)
 
@@ -85,42 +88,51 @@ setup() {
 
 	### Installing GoPhish v0.7.0 (*Reliable as of 11/30/19)
 	echo "${blue}${bold}[*] Downloading gophish v0.7.0 (x64)...${clear}"
-	wget https://github.com/gophish/gophish/releases/download/v0.7.0/gophish-v0.7.0-linux-64bit.zip -qq
+	wget https://github.com/gophish/gophish/releases/download/v0.7.0/gophish-v0.7.0-linux-64bit.zip -qq &&
 
 	echo "${yellow}${bold}[*] Creating a gophish folder: /opt/gophish...${clear}"
-	mkdir -p /opt/gophish
+	mkdir -p /opt/gophish &&
 
 	echo "${yellow}${bold}[*] Extracting 🍖(meat) of gophish to /opt/gophish...${clear}"
-	unzip -qq gophish-v0.7.0-linux-64bit.zip -d /opt/gophish
+	unzip -qq gophish-v0.7.0-linux-64bit.zip -d /opt/gophish &&
+
+	### Cleaning
+	rm gophish-v0.7.0-linux-64bit.zip &&
 
 	echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
-	mkdir -p /var/log/gophish
+	mkdir -p /var/log/gophish &&
 
 	echo "${blue}${bold}[*] Installing gophish...${clear}"
-	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json
-	cp gophish_start /etc/init.d/gophish
-	chmod +x /etc/init.d/gophish
-	update-rc.d gophish defaults
+	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json &&
+	
+	### Start Script Setup	
+	cp gophish_start /etc/init.d/gophish &&
+	chmod +x /etc/init.d/gophish &&
+	update-rc.d gophish defaults &&
 
 	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
+	sleep 1
 	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
 	service gophish start
 }
 
 ### Setup SSL Cert
 letsEncrypt() {
-
+	### Clearning Port 80
+	fuser -k -n tcp 80 1>/dev/null & 2>/dev/null
+	service gophish stop 2>/dev/null
+	
 	### Installing certbot-auto
 	echo "${blue}${bold}[*] Downloading certbot-auto...${clear}" 
 	wget https://dl.eff.org/certbot-auto -qq
 	chmod a+x certbot-auto
-	echo "${blue}${bold}[*] Installing certbot-auto...(This might take a couple of sec...)${clear}"
+	echo "${blue}${bold}[*] Installing certbot-auto...(This may take a few sec...)${clear}"
 	./certbot-auto --install-only --quiet 1>/dev/null
 
 	### Installing SSL Cert	
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
 	# Manual
-	./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
+	#./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
 	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --apache -d $domain &&
 
 	echo "${blue}${bold}[*] Configuring New SSL cert for $domain...${clear}" &&
@@ -141,6 +153,7 @@ gophishRestart() {
 
 	if [[ $service ]];
 	then
+		sleep 1
 		ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
 		echo "${green}${bold}[+] Gophish restarted: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}" &&
 		service gophish restart
@@ -158,7 +171,7 @@ while getopts ":sd:h" opt; do
 			setup ;;
 		d) 
 			domain=${OPTARG} 
-			letsEncrypt 
+			letsEncrypt && 
 			gophishRestart ;;
 		h | * ) 
 			exit_error ;;

@@ -48,7 +48,7 @@ usage() {
   banner
   cat <<EOF
 
-${bold}Usage: ${blue}./$(basename $0) [-s] [-d <domain name> ] [-h]${clear}
+${bold}Usage: ${blue}./$(basename $0) [-s] [-d <domain name> ] [-c] [-h]${clear}
 
 One shot to set up gophish server and/or create 
 LetsEncrypt SSL cert for your choice of domain.
@@ -57,6 +57,9 @@ Options:
 
   -s 			Set up gophish server
   -d <domain name>      SSL cert for phishing domain
+			${red}[WARNING] Configure 'A' record
+			before running the script${clear}
+  -c 			Clean-up for a fresh install
   -h              	This help message
 
 EOF
@@ -73,7 +76,7 @@ exit_error() {
 ### Setup GoPhish
 setup() {
 	### Cleaning Port 80
-	fuser -k -n tcp 80 1>/dev/null
+	fuser -k -s -n tcp 80
 
 	### Checking/Installing unzip
 	unzip=$(which unzip)
@@ -119,7 +122,7 @@ setup() {
 ### Setup SSL Cert
 letsEncrypt() {
 	### Clearning Port 80
-	fuser -k -n tcp 80 1>/dev/null & 2>/dev/null
+	fuser -k -s -n tcp 80 
 	service gophish stop 2>/dev/null
 	
 	### Installing certbot-auto
@@ -133,7 +136,7 @@ letsEncrypt() {
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
 	# Manual
 	#./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
-	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --apache -d $domain &&
+	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --standalone --preferred-challenges http -d $domain &&
 
 	echo "${blue}${bold}[*] Configuring New SSL cert for $domain...${clear}" &&
 	cp /etc/letsencrypt/live/$domain/privkey.pem /opt/gophish/domain.key &&
@@ -146,7 +149,6 @@ letsEncrypt() {
 	printf "User-agent: *\nDisallow: /" > /opt/gophish/static/endpoint/robots.txt &&
 	echo "${green}${bold}[+] Check if the cert is correctly installed: https://$domain/robots.txt${clear}"
 }
-
 
 gophishRestart() {
 	service=$(ls /etc/init.d/gophish 2>/dev/null)
@@ -162,9 +164,21 @@ gophishRestart() {
 	fi
 }
 
+cleanUp() {
+	service gophish stop 2>/dev/null
+	rm certbot-auto* 2>/dev/null
+	rm -rf /opt/gophish 2>/dev/null
+	rm /etc/init.d/gophish 2>/dev/null
+	rm /etc/letsencrypt/keys/* 2>/dev/null
+	rm /etc/letsencrypt/csr/* 2>/dev/null
+	rm -rf /etc/letsencrypt/archive/* 2>/dev/null
+	rm -rf /etc/letsencrypt/live/* 2>/dev/null
+	echo "${green}${bold}[+] Clean-up done!${clear}"
+}
+
 domain=''
 
-while getopts ":sd:h" opt; do
+while getopts ":scd:h" opt; do
 	case "${opt}" in
 		s)
 			banner
@@ -173,6 +187,8 @@ while getopts ":sd:h" opt; do
 			domain=${OPTARG} 
 			letsEncrypt && 
 			gophishRestart ;;
+		c)
+			cleanUp ;;
 		h | * ) 
 			exit_error ;;
 		:) 

@@ -119,15 +119,20 @@ letsEncrypt() {
 
 	### Installing SSL Cert	
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
-	./certbot-auto certonly -d $domain --manual --preferred-challenges dns && 
-	
+	# Manual
+	./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
+	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --apache -d $domain &&
+
 	echo "${blue}${bold}[*] Configuring New SSL cert for $domain...${clear}" &&
 	cp /etc/letsencrypt/live/$domain/privkey.pem /opt/gophish/domain.key &&
 	cp /etc/letsencrypt/live/$domain/fullchain.pem /opt/gophish/domain.crt &&
 	sed -i 's!false!true!g' /opt/gophish/config.json &&
 	sed -i 's!:80!:443!g' /opt/gophish/config.json &&
 	sed -i 's!example.crt!domain.crt!g' /opt/gophish/config.json &&
-	sed -i 's!example.key!domain.key!g' /opt/gophish/config.json 
+	sed -i 's!example.key!domain.key!g' /opt/gophish/config.json &&
+	mkdir -p /opt/gophish/static/endpoint &&
+	printf "User-agent: *\nDisallow: /" > /opt/gophish/static/endpoint/robots.txt &&
+	echo "${green}${bold}[+] Check if the cert is correctly installed: https://$domain/robots.txt${clear}"
 }
 
 

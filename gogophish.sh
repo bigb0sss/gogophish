@@ -29,7 +29,7 @@ ${blue}${bold}
 
      /|
     / |   /|
-<===  |=== | ------------------------------------
+<===  |=== | --------------------------------BETA
     \ |   \|
      \|
 ${clear}
@@ -48,19 +48,32 @@ usage() {
   banner
   cat <<EOF
 
-${bold}Usage: ${blue}./$(basename $0) [-s] [-d <domain name> ] [-c] [-h]${clear}
+${bold}Usage: ${blue}./$(basename $0) [-r <rid name>] [-e] [-s] [-d <domain name> ] [-c] [-h]${clear}
 
-One shot to set up gophish server and/or create 
-LetsEncrypt SSL cert for your choice of domain.
+One shot to set up:
+  - Gophish Server (Email Phishing Ver.)
+  - Gophish Server (SMS Phishing Ver.)
+  - SSL Cert for Phishing Domain (LetsEncrypt)
+  - And more... (Coming soon...)
 
 Options:
-
-  -s 			Set up gophish server
+  -e 			Setup Email Phishing Gophish Server
+  -s 			Setup SMS Phishing Gophish Server
+  -r <rid name>		Configure custom "rid=" parameter for landing page (e.g., https://example.com?rid={{.RID}})
+			If not specified, the default value would be "secure_id="
   -d <domain name>      SSL cert for phishing domain
-			${red}[WARNING] Configure 'A' record
-			before running the script${clear}
-  -c 			Clean-up for a fresh install
-  -h              	This help message
+			${red}[WARNING] Configure 'A' record before running the script${clear}
+  -c 			Cleanup for a fresh install
+  -h              	This help menu
+
+Examples:
+  ./$(basename $0) -e					Setup Email Phishing Gophish
+  ./$(basename $0) -s					Setup SMS Phishing Gophish
+  ./$(basename $0) -r <rid name> -e 			Setup Email Phishing Gophish + Your choice of rid
+  ./$(basename $0) -r <rid name> -s			Setup SMS Phishing Gophish + Your choice of rid
+  ./$(basename $0) -d <domain name>			Configure SSL cert for your phishing Domain
+  ./$(basename $0) -e -d <domain name>			Email Phishing Gophish + SSL cert for Phishing Domain
+  ./$(basename $0) -r <rid name> -e -d <domain name> 	Email Phishing Gophish + SSL cert + rid 
 
 EOF
 
@@ -68,46 +81,107 @@ exit $ec
  
 }
 
+### Exit
 exit_error() {
 	usage
 	exit 1
 }
 
-### Setup GoPhish
-setup() {
-	### Cleaning Port 80
-	fuser -k -s -n tcp 80
+dependencyCheck() {
+	### Update Sources
+	echo "${blue}${bold}[*] Updating source lists...${clear}"
+	apt-get update -y >/dev/null 2>&1	
+
 
 	### Checking/Installing unzip
 	unzip=$(which unzip)
 
 	if [[ $unzip ]];
 	then
-		echo "${cyan}${bold}[+] Unzip already installed${clear}"
+		echo "${green}${bold}[+] Unzip already installed${clear}"
 	else
 		echo "${blue}${bold}[*] Installing unzip...${clear}"
-		apt-get install unzip 1>/dev/null
+		apt-get install unzip -y >/dev/null 2>&1
 	fi
 
-	### Installing GoPhish v0.7.0 (*Reliable as of 11/30/19)
-	echo "${blue}${bold}[*] Downloading gophish v0.7.0 (x64)...${clear}"
-	wget https://github.com/gophish/gophish/releases/download/v0.7.0/gophish-v0.7.0-linux-64bit.zip -qq &&
+	### Checking/Installing go
+        gocheck=$(which go)
+
+        if [[ $gocheck ]];
+        then
+                echo "${green}${bold}[+] Golang already installed${clear}"
+        else
+                echo "${blue}${bold}[*] Installing Golang...${clear}"
+                apt-get install golang -y >/dev/null 2>&1
+        fi
+	
+	### Checking/Installing git
+        gitcheck=$(which git)
+
+        if [[ $gitcheck ]];
+        then
+                echo "${green}${bold}[+] Git already installed${clear}"
+        else
+                echo "${blue}${bold}[*] Installing Git...${clear}"
+                apt-get install git -y >/dev/null 2>&1
+        fi
+
+	### Checking/Installing pip (*Needed to install Twilio lib)
+        pipcheck=$(which pip)
+
+	if [[ $pipcheck ]];
+        then
+                echo "${green}${bold}[+] Pip already installed${clear}"
+        else
+                echo "${blue}${bold}[*] Installing Pip...${clear}"
+                apt-get install python-pip -y >/dev/null 2>&1
+		
+        fi
+
+}
+
+
+
+### Setup Email Version Gophish
+setupEmail() {
+	### Cleaning Port 80
+	fuser -k -s -n tcp 80
+
+	### Deleting Previous Gophish Source (*Need to be removed to update new rid)
+	rm -rf /root/go/src/github.com/gophish >/dev/null 2>&1 &&
+
+	### Installing GoPhish v0.8.0
+        echo "${blue}${bold}[*] Downloading gophish (x64)...${clear}"
+        mkdir -p /root/go &&
+	export GOPATH=/root/go &&
+	go get github.com/gophish/gophish >/dev/null 2>&1 &&
 
 	echo "${yellow}${bold}[*] Creating a gophish folder: /opt/gophish...${clear}"
-	mkdir -p /opt/gophish &&
+        mkdir -p /opt/gophish &&
 
-	echo "${yellow}${bold}[*] Extracting 🍖(meat) of gophish to /opt/gophish...${clear}"
-	unzip -qq gophish-v0.7.0-linux-64bit.zip -d /opt/gophish &&
+	echo "${yellow}${bold}[*] Building gophish🐟 to: /opt/gophish... ${clear}"
+        
+	if [ "$rid" != "" ]
+	then
+		echo "${red}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
+	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
+		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
+		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+	else
+		echo "${red}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
+		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
+		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep secure)
+		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+        fi
 
-	### Cleaning
-	rm gophish-v0.7.0-linux-64bit.zip &&
-
-	echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
-	mkdir -p /var/log/gophish &&
-
-	echo "${blue}${bold}[*] Installing gophish...${clear}"
+	go build $GOPATH/src/github.com/gophish/gophish &&
+	mv ./gophish /opt/gophish/gophish &&
+	cp -R $GOPATH/src/github.com/gophish/gophish/* /opt/gophish &&
 	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json &&
-	
+
+        echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
+        mkdir -p /var/log/gophish &&
+
 	### Start Script Setup	
 	cp gophish_start /etc/init.d/gophish &&
 	chmod +x /etc/init.d/gophish &&
@@ -118,6 +192,79 @@ setup() {
 	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
 	service gophish start
 }
+
+setupSMS() {
+	### Cleaning Port 80
+	fuser -k -s -n tcp 80
+
+	### Deleting Previous Gophish Source (*Need to be removed to update new rid)
+	rm -rf $GOPATH/src/github.com/gophish >/dev/null 2>&1 &&
+
+	### Installing GoPhish v0.8.0
+        echo "${blue}${bold}[*] Downloading gophish (x64)...${clear}"
+        mkdir -p /root/go &&
+	export GOPATH=/root/go &&
+	go get github.com/gophish/gophish >/dev/null 2>&1 &&
+
+	echo "${yellow}${bold}[*] Creating a gophish folder: /opt/gophish...${clear}"
+        mkdir -p /opt/gophish &&
+
+	echo "${yellow}${bold}[*] Building gophish🐟 to: /opt/gophish... ${clear}"
+        
+	if [ "$rid" != "" ]
+	then
+		echo "${red}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
+	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
+		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
+		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+	else
+		echo "${red}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
+		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
+		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
+		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+        fi
+
+	go build $GOPATH/src/github.com/gophish/gophish &&
+	mv ./gophish /opt/gophish/gophish &&
+	cp -R $GOPATH/src/github.com/gophish/gophish/* /opt/gophish &&
+	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json &&
+
+        echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
+        mkdir -p /var/log/gophish &&
+
+	### Getting gosmish.py (Author: fals3s3t)
+	echo "${yellow}${bold}[*] Pulling gosmish.py (Author: fals3s3t) to: /opt/gophish...${clear}"
+	wget https://raw.githubusercontent.com/fals3s3t/gosmish/master/gosmish.py -P /opt/gophish/gosmish.py 2>/dev/null &&
+	chmod +x /opt/gophish/gosmish.py
+
+	### Installing Twilio
+	echo "${blue}${bold}[*] Installing Twilio...${clear}"
+	pip install -q  twilio >/dev/null 2>&1 &&
+
+	echo "${blue}${bold}[*] Installing and configuring Postfix for SMS SMTP blackhole...${clear}"
+	name=$(hostname)
+	echo "postfix    postfix/mailname string sms.sms " | debconf-set-selections
+	echo "postfix postfix/main_mailer_type string 'Local Only'" | debconf-set-selections
+	apt-get -y  install postfix >/dev/null 2>&1
+	apt-get -y  install postfix-pcre >/dev/null 2>&1
+
+	sed -i  "/myhostname/c\myhostname = $name" /etc/postfix/main.cf >/dev/null 2>&1 &&
+	echo 'virtual_alias_maps = pcre:/etc/postfix/virtual' >> /etc/postfix/main.cf
+	echo '/.*/                        nonexist' > /etc/postfix/virtual
+	service postfix stop &&
+	service postfix start &&
+
+	### Start Script Setup	
+	cp gophish_start /etc/init.d/gophish &&
+	chmod +x /etc/init.d/gophish &&
+	update-rc.d gophish defaults &&
+
+	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
+	sleep 1
+	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
+	service gophish start        
+}
+
 
 ### Setup SSL Cert
 letsEncrypt() {
@@ -134,8 +281,9 @@ letsEncrypt() {
 
 	### Installing SSL Cert	
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
-	# Manual
+	### Manual
 	#./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
+	### Auto
 	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --standalone --preferred-challenges http -d $domain &&
 
 	echo "${blue}${bold}[*] Configuring New SSL cert for $domain...${clear}" &&
@@ -165,7 +313,9 @@ gophishRestart() {
 }
 
 cleanUp() {
+	echo "${green}${bold}Cleaning...1...2...3...${clear}"
 	service gophish stop 2>/dev/null
+	rm -rf /root/go/src/github.com/gophish 2>/dev/null
 	rm certbot-auto* 2>/dev/null
 	rm -rf /opt/gophish 2>/dev/null
 	rm /etc/init.d/gophish 2>/dev/null
@@ -173,16 +323,24 @@ cleanUp() {
 	rm /etc/letsencrypt/csr/* 2>/dev/null
 	rm -rf /etc/letsencrypt/archive/* 2>/dev/null
 	rm -rf /etc/letsencrypt/live/* 2>/dev/null
-	echo "${green}${bold}[+] Clean-up done!${clear}"
+	echo "${green}${bold}[+] Done!${clear}"
 }
 
 domain=''
+rid=''
 
-while getopts ":scd:h" opt; do
+while getopts ":r:esd:ch" opt; do
 	case "${opt}" in
+		r)
+			rid=$OPTARG ;;
+		e)
+			banner
+			dependencyCheck
+			setupEmail ;;
 		s)
 			banner
-			setup ;;
+			dependencyCheck
+			setupSMS ;;
 		d) 
 			domain=${OPTARG} 
 			letsEncrypt && 
@@ -192,7 +350,7 @@ while getopts ":scd:h" opt; do
 		h | * ) 
 			exit_error ;;
 		:) 
-			echo "${red}${bold}[-] Error: -${OPTARG} requires an argument (e.g.) gogophish.com)${clear}" 1>&2
+			echo "${red}${bold}[-] Error: -${OPTARG} requires an argument (e.g., -r page_id or -d gogophish.com)${clear}" 1>&2
 			exit 1;;
 	esac
 done

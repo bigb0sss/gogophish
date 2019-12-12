@@ -163,15 +163,15 @@ setupEmail() {
         
 	if [ "$rid" != "" ]
 	then
-		echo "${red}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
+		echo "${blue}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
 	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
-		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
 	else
-		echo "${red}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
+		echo "${blue}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
 		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep secure)
-		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
         fi
 
 	go build $GOPATH/src/github.com/gophish/gophish &&
@@ -213,15 +213,15 @@ setupSMS() {
         
 	if [ "$rid" != "" ]
 	then
-		echo "${red}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
+		echo "${blue}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
 	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
-		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
 	else
-		echo "${red}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
+		echo "${blue}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
 		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
-		echo "${red}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
+		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
         fi
 
 	go build $GOPATH/src/github.com/gophish/gophish &&
@@ -323,6 +323,7 @@ cleanUp() {
 	rm /etc/letsencrypt/csr/* 2>/dev/null
 	rm -rf /etc/letsencrypt/archive/* 2>/dev/null
 	rm -rf /etc/letsencrypt/live/* 2>/dev/null
+	rm -rf /etc/letsencrypt/renewal/* 2>/dev/null
 	echo "${green}${bold}[+] Done!${clear}"
 }
 

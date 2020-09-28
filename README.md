@@ -56,7 +56,6 @@ Examples:
   ./gogophish.sh -r <rid name> -e -d <domain name> 	Email Phishing Gophish + SSL cert + rid
 
 ```
-<br />
 
 ### Example
 

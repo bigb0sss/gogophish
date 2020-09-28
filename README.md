@@ -163,6 +163,9 @@ $ ./ec2_create.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_cr
 $ ./ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_termination.sh
 ```
 
+### Vultr
+coming soon...
+
 ## Wildcard SSL Certificate Setup
 
 If you are planning to use subdomains with your phishing domain, do the following to add the wildcard SSL certificate. 

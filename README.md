@@ -112,8 +112,41 @@ IMPORTANT NOTES:
 
 ```
 
+## VPS Creation (CLI)
+### AWS
 
-### Work In-Progress
+```
+1) Install aws-cli - https://github.com/aws/aws-cli
+* MacOS
+wget https://awscli.amazonaws.com/AWSCLIV2.pkg
+installer -pkg AWSCLIV2.pkg -target
+
+2) AWS Configure
+aws configure
+	AWS Access Key ID [None]: <Your Access Key>
+	AWS Secret Access Key [None]: <Your Secret Access Key>
+	Default region name [None]: us-east-2
+	Default output format [None]: json
+
+3) SSH Key Pairs
+First, 'ssh-keygen' to create a SSH key pair
+Second, import the .pub key to AWS EC2 Key Pair
+
+aws ec2 import-key-pair \
+	--key-name gogophish-ssh \
+	--public-key-material file:///Users/bigb0ss/tools/aws-cli/.ssh/gogophish_id_rsa.pub \
+	--region us-east-2
+	
+4) Create AWS EC2
+ec2_create.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_create.sh
+
+5) Terminate AWS EC2
+ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_termination.sh
+```
+
+
+
+## Work In-Progress
 * SMS Phishing Server Config is not 100% integrated to gogophish. And disclaimer to using fals3s3t python script.
 
 ## Change Log

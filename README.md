@@ -12,6 +12,8 @@ Table of contents
    * [Usage](#usage)
    * [Example](#example)
    * [Phishing Server](#phishing-server-vps)
+   	* [AWS](#aws)
+   * [Wildcard SSL Certificate Setup](#wildcard-ssl-certificate-setup)
 <!--te-->
 
 ## Installation

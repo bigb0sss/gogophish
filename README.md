@@ -149,7 +149,8 @@ ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_t
 If you are planning to use subdomains with your phishing domain, do the following to add the wildcard SSL certificate. 
 
 ```
-1) certbot certonly -d *.phish-me.com --manual --preferred-challenges dns
+1) Run the following Certbot command:
+$ certbot certonly -d *.phish-me.com --manual --preferred-challenges dns
 
 Saving debug log to /var/log/letsencrypt/letsencrypt.log
 Plugins selected: Authenticator manual, Installer None
@@ -177,7 +178,7 @@ Before continuing, verify the record is deployed.
 Press Enter to Continue
 
 2) Configure the above _acme-challege to your domain's DNS TXT record. Use the following command to confirm:
-dig -t TXT _acme-challenge.phish-me.com
+$ dig -t TXT _acme-challenge.phish-me.com
 
 ; <<>> DiG 9.10.6 <<>> -t TXT _acme-challenge.phish-me.com
 ;; global options: +cmd

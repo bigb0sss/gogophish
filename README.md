@@ -6,7 +6,7 @@ Gophish is an open-source phishing toolkit designed for businesses and penetrati
 
 ## Usage & Example
 ### Usage
-```bash
+```
 ./gogophish.sh
 
 	                          _     _     _

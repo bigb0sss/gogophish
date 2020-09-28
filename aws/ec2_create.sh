@@ -1,7 +1,12 @@
 #!/usr/bin/bash
+# Version         : 1.0
+# Created date    : 09/27/2020
+# Last update     : 09/27/2020
+# Author          : bigb0ss
+# Description     : AWC EC2 Instance Creation
+
 # --key-name: Create AWS EC2 "Key pairs" called "gogophish-ssh"
 # --security-groups-ids: Create AWS EC2 security group. This is optional, but good for restricting SSH and Admin page access. 
-
 
 aws ec2 run-instances \
         --region us-east-2 \

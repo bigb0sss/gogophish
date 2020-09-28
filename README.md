@@ -4,6 +4,30 @@ A quick Bash script to automate the [Gophish](https://github.com/gophish/gophish
 
 Gophish is an open-source phishing toolkit designed for businesses and penetration testers. It provides the ability to quickly and easily setup and execute phishing engagements and security awareness training.
 
+Table of contents
+=================
+
+<!--ts-->
+   * [Installation](##Installation)
+   * [Usage](#usage)
+      * [STDIN](#stdin)
+      * [Local files](#local-files)
+      * [Remote files](#remote-files)
+      * [Multiple files](#multiple-files)
+      * [Combo](#combo)
+      * [Auto insert and update TOC](#auto-insert-and-update-toc)
+      * [GitHub token](#github-token)
+   * [Tests](#tests)
+   * [Dependency](#dependency)
+<!--te-->
+
+## Installation
+```
+git clone https://github.com/bigb0sss/gogophish.git
+cd gogophish
+chmod +x gogophish.sh
+```
+
 ## Usage & Example
 
 This script will help you automate installing + configuring your phishing domain with SSL certificate using [Certbot](https://github.com/certbot/certbot).

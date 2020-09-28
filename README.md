@@ -20,8 +20,8 @@ Table of contents
    * [Wildcard SSL Certificate Setup](#wildcard-ssl-certificate-setup)
 <!--te-->
 
-Installation
-=================
+## Installation
+
 ```
 git clone https://github.com/bigb0sss/gogophish.git
 cd gogophish

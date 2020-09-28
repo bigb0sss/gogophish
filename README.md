@@ -4,7 +4,7 @@
 
 # Gogophish
 
-A quick Bash script to automate the [Gophish](https://github.com/gophish/gophish) installation.
+A quick Bash script to automate the [Gophish](https://github.com/gophish/gophish) installation + LetsEncrypt your phishing domain.
 
 Gophish is an open-source phishing toolkit designed for businesses and penetration testers. It provides the ability to quickly and easily setup and execute phishing engagements and security awareness training.
 
@@ -20,7 +20,8 @@ Table of contents
    * [Wildcard SSL Certificate Setup](#wildcard-ssl-certificate-setup)
 <!--te-->
 
-## Installation
+Installation
+=================
 ```
 git clone https://github.com/bigb0sss/gogophish.git
 cd gogophish

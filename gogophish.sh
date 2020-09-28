@@ -4,6 +4,8 @@
 # Last update     : 09/27/2020
 # Author          : bigb0ss
 # Description     : Automated script to install gophish
+# Note            : 
+#                   09/20/20 - gophish admin password is not longer static. Added function to grab the temporary password for the initial login. You will be prompted to change the password as you login
 
 ### Colors
 red=`tput setaf 1`;

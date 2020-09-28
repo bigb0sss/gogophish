@@ -8,7 +8,7 @@ Table of contents
 =================
 
 <!--ts-->
-   * [Installation](##Installation)
+   * [Installation](#installation)
    * [Usage](#usage)
       * [STDIN](#stdin)
       * [Local files](#local-files)

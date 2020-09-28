@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-#
-# gogophish       
-#
-# Author: bigb0ss 
-#
+# Version         : 2.0
+# Created date    : 12/09/2019
+# Last update     : 09/27/2020
+# Author          : bigb0ss
+# Description     : Automated script to install gophish
 
 ### Colors
 red=`tput setaf 1`;
@@ -18,20 +18,20 @@ clear=`tput sgr0`;
 banner() {
 cat <<EOF
 ${blue}${bold}
-			       _     _     _
-                              | |   (_)   | |
-  __ _  ___   __ _  ___  _ __ | |__  _ ___| |__
- / _\` |/ _ \ / _\` |/ _ \| '_ \| '_ \| / __| '_ \\
-| (_| | (_) | (_| | (_) | |_) | | | | \__ \ | | |
- \__, |\___/ \__, |\___/| .__/|_| |_|_|___/_| |_|
-  __/ |       __/ |     | |   [bigb0ss]
- |___/       |___/      |_|
+	                          _     _     _
+                                 | |   (_)   | |
+     __ _  ___   __ _  ___  _ __ | |__  _ ___| |__
+    / _\` |/ _ \ / _\` |/ _ \| '_ \| '_ \| / __| '_ \\
+   | (_| | (_) | (_| | (_) | |_) | | | | \__ \ | | |
+    \__, |\___/ \__, |\___/| .__/|_| |_|_|___/_| |_|
+     __/ |       __/ |     | |           [bigb0ss]
+    |___/       |___/      |_|
 
-     /|
-    / |   /|
-<===  |=== | --------------------------------BETA
-    \ |   \|
-     \|
+        /|
+       / |   /|
+   <===  |=== | --------------------------------v2.0
+       \ |   \|
+        \|
 ${clear}
 EOF
 
@@ -48,13 +48,14 @@ usage() {
   banner
   cat <<EOF
 
+A quick Bash script to install GoPhish server. 
+
 ${bold}Usage: ${blue}./$(basename $0) [-r <rid name>] [-e] [-s] [-d <domain name> ] [-c] [-h]${clear}
 
 One shot to set up:
   - Gophish Server (Email Phishing Ver.)
   - Gophish Server (SMS Phishing Ver.)
   - SSL Cert for Phishing Domain (LetsEncrypt)
-  - And more... (Coming soon...)
 
 Options:
   -e 			Setup Email Phishing Gophish Server
@@ -87,6 +88,7 @@ exit_error() {
 	exit 1
 }
 
+### Initial Update & Dependency Check
 dependencyCheck() {
 	### Update Sources
 	echo "${blue}${bold}[*] Updating source lists...${clear}"
@@ -133,14 +135,12 @@ dependencyCheck() {
         then
                 echo "${green}${bold}[+] Pip already installed${clear}"
         else
-                echo "${blue}${bold}[*] Installing Pip...${clear}"
+                echo "${blue}${bold}[*] Installing pip...${clear}"
                 apt-get install python-pip -y >/dev/null 2>&1
 		
         fi
 
 }
-
-
 
 ### Setup Email Version Gophish
 setupEmail() {
@@ -156,41 +156,29 @@ setupEmail() {
 	export GOPATH=/root/go &&
 	go get github.com/gophish/gophish >/dev/null 2>&1 &&
 
-	echo "${yellow}${bold}[*] Creating a gophish folder: /opt/gophish...${clear}"
+	echo "${blue}${bold}[*] Creating a gophish folder: /opt/gophish${clear}"
         mkdir -p /opt/gophish &&
 
-	echo "${yellow}${bold}[*] Building gophish🐟 to: /opt/gophish... ${clear}"
-        
 	if [ "$rid" != "" ]
 	then
 		echo "${blue}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
 	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
 		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
-	else
-		echo "${blue}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
-		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
-		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep secure)
-		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
-        fi
+    fi
 
 	go build $GOPATH/src/github.com/gophish/gophish &&
 	mv ./gophish /opt/gophish/gophish &&
 	cp -R $GOPATH/src/github.com/gophish/gophish/* /opt/gophish &&
 	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json &&
 
-        echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
+        echo "${blue}${bold}[*] Creating a gophish log folder: /var/log/gophish${clear}"
         mkdir -p /var/log/gophish &&
 
 	### Start Script Setup	
 	cp gophish_start /etc/init.d/gophish &&
 	chmod +x /etc/init.d/gophish &&
-	update-rc.d gophish defaults &&
-
-	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-	sleep 1
-	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
-	service gophish start
+	update-rc.d gophish defaults
 }
 
 setupSMS() {
@@ -206,34 +194,27 @@ setupSMS() {
 	export GOPATH=/root/go &&
 	go get github.com/gophish/gophish >/dev/null 2>&1 &&
 
-	echo "${yellow}${bold}[*] Creating a gophish folder: /opt/gophish...${clear}"
+	echo "${blue}${bold}[*] Creating a gophish folder: /opt/gophish${clear}"
         mkdir -p /opt/gophish &&
 
-	echo "${yellow}${bold}[*] Building gophish🐟 to: /opt/gophish... ${clear}"
-        
 	if [ "$rid" != "" ]
 	then
 		echo "${blue}${bold}[*] Updating \"rid\" to \"$rid\"${clear}"
 	        sed -i 's!rid!'$rid'!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
 		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
 		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
-	else
-		echo "${blue}${bold}[*] Updating \"rid\" to \"secure_id\"${clear}"
-		sed -i 's!rid!secure_id!g' $GOPATH/src/github.com/gophish/gophish/models/campaign.go
-		ridConfirm=$(cat $GOPATH/src/github.com/gophish/gophish/models/campaign.go | grep $rid)
-		echo "${blue}${bold}[*] Confirmation: $ridConfirm (campaign.go)${clear}"
-        fi
+    fi
 
 	go build $GOPATH/src/github.com/gophish/gophish &&
 	mv ./gophish /opt/gophish/gophish &&
 	cp -R $GOPATH/src/github.com/gophish/gophish/* /opt/gophish &&
 	sed -i 's!127.0.0.1!0.0.0.0!g' /opt/gophish/config.json &&
 
-        echo "${yellow}${bold}[*] Creating a log folder: /var/log/gophish...${clear}"
+        echo "${blue}${bold}[*] Creating a gophish log folder: /var/log/gophish${clear}"
         mkdir -p /var/log/gophish &&
 
 	### Getting gosmish.py (Author: fals3s3t)
-	echo "${yellow}${bold}[*] Pulling gosmish.py (Author: fals3s3t) to: /opt/gophish...${clear}"
+	echo "${blue}${bold}[*] Pulling gosmish.py (Author: fals3s3t) to: /opt/gophish...${clear}"
 	wget https://raw.githubusercontent.com/fals3s3t/gosmish/master/gosmish.py -P /opt/gophish/gosmish.py 2>/dev/null &&
 	chmod +x /opt/gophish/gosmish.py
 
@@ -257,12 +238,7 @@ setupSMS() {
 	### Start Script Setup	
 	cp gophish_start /etc/init.d/gophish &&
 	chmod +x /etc/init.d/gophish &&
-	update-rc.d gophish defaults &&
-
-	ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-	sleep 1
-	echo "${green}${bold}[+] Gophish started: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}"
-	service gophish start        
+	update-rc.d gophish defaults
 }
 
 
@@ -273,18 +249,18 @@ letsEncrypt() {
 	service gophish stop 2>/dev/null
 	
 	### Installing certbot-auto
-	echo "${blue}${bold}[*] Downloading certbot-auto...${clear}" 
-	wget https://dl.eff.org/certbot-auto -qq
-	chmod a+x certbot-auto
-	echo "${blue}${bold}[*] Installing certbot-auto...(This may take a few sec...)${clear}"
-	./certbot-auto --install-only --quiet 1>/dev/null
+	echo "${blue}${bold}[*] Installing certbot...${clear}" 
+	#wget https://dl.eff.org/certbot-auto -qq
+	#chmod a+x certbot-auto
+	apt-get install certbot -y >/dev/null 2>&1
 
 	### Installing SSL Cert	
 	echo "${blue}${bold}[*] Installing SSL Cert for $domain...${clear}"
+
 	### Manual
 	#./certbot-auto certonly -d $domain --manual --preferred-challenges dns -m example@gmail.com --agree-tos && 
 	### Auto
-	./certbot-auto certonly --non-interactive --agree-tos --email example@gmail.com --standalone --preferred-challenges http -d $domain &&
+	certbot certonly --non-interactive --agree-tos --email example@gmail.com --standalone --preferred-challenges http -d $domain &&
 
 	echo "${blue}${bold}[*] Configuring New SSL cert for $domain...${clear}" &&
 	cp /etc/letsencrypt/live/$domain/privkey.pem /opt/gophish/domain.key &&
@@ -298,15 +274,17 @@ letsEncrypt() {
 	echo "${green}${bold}[+] Check if the cert is correctly installed: https://$domain/robots.txt${clear}"
 }
 
-gophishRestart() {
+gophishStart() {
 	service=$(ls /etc/init.d/gophish 2>/dev/null)
 
 	if [[ $service ]];
 	then
 		sleep 1
-		ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
-		echo "${green}${bold}[+] Gophish restarted: https://$ipAddr:3333 ([Login] Username:admin Password:gophish)${clear}" &&
-		service gophish restart
+		service gophish restart &&
+		#ipAddr=$(ip -4 addr show | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | grep -v 127.0.0.1)
+		ipAddr=$(curl ifconfig.io 2>/dev/null)
+		pass=$(cat /var/log/gophish/gophish.error | grep 'Please login with' | cut -d '"' -f 4 | cut -d ' ' -f 10 | tail -n 1)
+		echo "${green}${bold}[+] Gophish Started: https://$ipAddr:3333 - [Login] Username: admin, Temporary Password: $pass${clear}"
 	else
 		exit 1
 	fi
@@ -337,15 +315,17 @@ while getopts ":r:esd:ch" opt; do
 		e)
 			banner
 			dependencyCheck
-			setupEmail ;;
+			setupEmail
+			gophishStart ;;
 		s)
 			banner
 			dependencyCheck
-			setupSMS ;;
+			setupSMS
+			gophishStart ;;
 		d) 
 			domain=${OPTARG} 
 			letsEncrypt && 
-			gophishRestart ;;
+			gophishStart ;;
 		c)
 			cleanUp ;;
 		h | * ) 

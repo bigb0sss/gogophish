@@ -11,7 +11,7 @@ Table of contents
    * [Installation](#installation)
    * [Usage](#usage)
    * [Example](#example)
-   * [Phishing_Server](#phishing server)
+   * [Phishing_Server](#phishing_server)
 <!--te-->
 
 ## Installation

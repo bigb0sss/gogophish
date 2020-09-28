@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://github.com/bigb0sss/gogophish/blob/master/gogophish_img.png">
+</p>
+
 # Gogophish
 
 A quick Bash script to automate the [Gophish](https://github.com/gophish/gophish) installation.

@@ -118,11 +118,11 @@ IMPORTANT NOTES:
 ```
 1) Install aws-cli - https://github.com/aws/aws-cli
 * MacOS
-wget https://awscli.amazonaws.com/AWSCLIV2.pkg
-installer -pkg AWSCLIV2.pkg -target
+$ wget https://awscli.amazonaws.com/AWSCLIV2.pkg
+$ installer -pkg AWSCLIV2.pkg -target
 
 2) AWS Configure
-aws configure
+$ aws configure
 	AWS Access Key ID [None]: <Your Access Key>
 	AWS Secret Access Key [None]: <Your Secret Access Key>
 	Default region name [None]: us-east-2
@@ -132,16 +132,16 @@ aws configure
 First, 'ssh-keygen' to create a SSH key pair
 Second, import the .pub key to AWS EC2 Key Pair
 
-aws ec2 import-key-pair \
+$ aws ec2 import-key-pair \
 	--key-name gogophish-ssh \
 	--public-key-material file:///Users/bigb0ss/tools/aws-cli/.ssh/gogophish_id_rsa.pub \
 	--region us-east-2
 	
 4) Create AWS EC2
-ec2_create.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_create.sh
+$ ./ec2_create.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_create.sh
 
 5) Terminate AWS EC2
-ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_termination.sh
+$ ./ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_termination.sh
 ```
 
 ## Wildcard SSL Certificate Setup

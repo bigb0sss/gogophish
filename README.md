@@ -112,7 +112,7 @@ IMPORTANT NOTES:
 
 ```
 
-## VPS Creation (CLI)
+## Phishing Server (VPS)
 ### AWS
 
 ```
@@ -144,7 +144,64 @@ ec2_create.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_create
 ec2_termination.sh - https://github.com/bigb0sss/gogophish/blob/master/aws/ec2_termination.sh
 ```
 
+## Wildcard SSL Certificate Setup
 
+If you are planning to use subdomains with your phishing domain, do the following to add the wildcard SSL certificate. 
+
+```
+1) certbot certonly -d *.phish-me.com --manual --preferred-challenges dns
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator manual, Installer None
+Obtaining a new certificate
+Performing the following challenges:
+dns-01 challenge for phish-me.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+NOTE: The IP of this machine will be publicly logged as having requested this
+certificate. If you're running certbot in manual mode on a machine that is not
+your server, please ensure you're okay with that.
+
+Are you OK with your IP being logged?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: Y
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please deploy a DNS TXT record under the name
+_acme-challenge.phish-me.com with the following value:
+
+yunoNuR-DxwUpypvTGYtWpysYslnAFutagi7swXoi6k
+
+Before continuing, verify the record is deployed.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Press Enter to Continue
+
+2) Configure the above _acme-challege to your domain's DNS TXT record. Use the following command to confirm:
+dig -t TXT _acme-challenge.phish-me.com
+
+; <<>> DiG 9.10.6 <<>> -t TXT _acme-challenge.phish-me.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 39714
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 512
+;; QUESTION SECTION:
+;_acme-challenge.phish-me.com. IN	TXT
+
+;; ANSWER SECTION:
+_acme-challenge.phish-me.com. 3600 IN TXT	"yunoNuR-DxwUpypvTGYtWpysYslnAFutagi7swXoi6k"
+
+3) Run the following Bash script:
+
+#!/usr/bin/bash
+domain="<Your Domain>"
+
+cp /etc/letsencrypt/live/$domain-0001/privkey.pem /opt/gophish/domain.key &&
+cp /etc/letsencrypt/live/$domain-0001/fullchain.pem /opt/gophish/domain.crt 
+service gophish restart
+```
 
 ## Work In-Progress
 * SMS Phishing Server Config is not 100% integrated to gogophish. And disclaimer to using fals3s3t python script.

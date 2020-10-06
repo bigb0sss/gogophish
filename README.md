@@ -233,6 +233,7 @@ service gophish restart
 
 ## Work In-Progress
 * SMS Phishing Server Config is not 100% integrated to gogophish. And disclaimer to using fals3s3t python script.
+* Adding another function to install Evilginx with GoPhish
 
 ## Change Log
 * 09/26/20 - gogophish BETA is decommissioned

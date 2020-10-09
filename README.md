@@ -136,7 +136,7 @@ IMPORTANT NOTES:
 
 ```
 
-## Phishing Server (VPS)
+## Phishing Server Setup (VPS)
 ### AWS
 
 ```

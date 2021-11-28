@@ -270,6 +270,8 @@ letsEncrypt() {
 	sed -i 's!:80!:443!g' /opt/gophish/config.json &&
 	sed -i 's!example.crt!domain.crt!g' /opt/gophish/config.json &&
 	sed -i 's!example.key!domain.key!g' /opt/gophish/config.json &&
+	sed -i 's!gophish_admin.crt!domain.crt!g' /opt/gophish/config.json &&
+	sed -i 's!gophish_admin.key!domain.key!g' /opt/gophish/config.json &&
 	mkdir -p /opt/gophish/static/endpoint &&
 	printf "User-agent: *\nDisallow: /" > /opt/gophish/static/endpoint/robots.txt &&
 	echo "${green}${bold}[+] Check if the cert is correctly installed: https://$domain/robots.txt${clear}"

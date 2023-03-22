@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 """
-# Version         : 2.1
+# Version         : 0.1.3
 # Created date    : 12/09/2019
 # Last update     : 03/22/2023
 # Author          : bigb0ss

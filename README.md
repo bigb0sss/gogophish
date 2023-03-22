@@ -1,8 +1,7 @@
 <p align="center">
   <img src="https://github.com/bigb0sss/gogophish/blob/master/gogophish_img.png">
+  <h1 align="center">gogophish v0.1.3</h1>
 </p>
-
-# Gogophish
 
 A quick Bash script to automate the [Gophish](https://github.com/gophish/gophish) installation + LetsEncrypt your phishing domain.
 

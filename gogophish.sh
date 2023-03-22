@@ -5,10 +5,12 @@
 # Created date    : 12/09/2019
 # Last update     : 03/22/2023
 # Author          : bigb0ss
-# Description     : Automated script to install gophish
-# Note            : 
+# Description     : Automated script to install Gophish and configure SSL certificate with certbot
+# Release Note    : 
 	09/20/20: 
-		- gophish admin password is not longer static. Added function to grab the temporary password for the initial login. 
+		- Gophish admin password is not longer static. Added function to grab the temporary password for the initial login. 
+	03/22/23:
+		- Updated the script to simply git clone the source and build the source 
 	  
 """
 
@@ -36,7 +38,7 @@ ${blue}${bold}
 
         /|
        / |   /|
-   <===  |=== | --------------------------------v2.0
+   <===  |=== | --------------------------------v0.1.3
        \ |   \|
         \|
 ${clear}

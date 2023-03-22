@@ -46,7 +46,7 @@ This script will help you automate installing + configuring your phishing domain
 
         /|
        / |   /|
-   <===  |=== | --------------------------------v2.0
+   <===  |=== | --------------------------------v0.1.3
        \ |   \|
         \|
 
@@ -97,7 +97,7 @@ Examples:
 
         /|
        / |   /|
-   <===  |=== | --------------------------------v2.0
+   <===  |=== | --------------------------------v0.1.3
        \ |   \|
         \|
 
@@ -236,6 +236,7 @@ service gophish restart
 * Adding another function to install Evilginx with GoPhish
 
 ## Change Log
-* 09/26/20 - gogophish BETA is decommissioned
-* 09/27/20 - gogophish v1.0 is decommissioned
-* 09/27/20 - gogophish v2.0 is uploaded
+* 09/26/20 - gogophish BETA is released
+* 09/27/20 - gogophish v0.1.1 is released
+* 09/27/20 - gogophish v0.1.2 is released
+* 03/22/23 - gogophish v0.1.3 is released

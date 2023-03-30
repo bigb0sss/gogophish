@@ -1,6 +1,6 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-"""
+<<com
 # Version         : 0.1.3
 # Created date    : 12/09/2019
 # Last update     : 03/22/2023
@@ -12,7 +12,7 @@
 	03/22/23:
 		- Updated the script to simply git clone the source and build the source 
 	  
-"""
+com
 
 ### Colors
 red=`tput setaf 1`;
